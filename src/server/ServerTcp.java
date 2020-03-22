@@ -1,6 +1,5 @@
 package server;
 
-import server.tcp.ServerTcp;
 import server.udp.ServerUdp;
 
 import java.io.BufferedReader;
@@ -9,8 +8,9 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Main {
+public class ServerTcp {
     private ServerSocket socket_server;
+    private int port;
 
     /**
      * Méthode permettant de créer un serveur TCP au port indiqué.
@@ -18,8 +18,9 @@ public class Main {
      * @param port port souhaité.
      * @throws IOException
      */
-    public Main(int port) throws IOException {
+    public ServerTcp(int port) throws IOException {
         this.socket_server = new ServerSocket(port);
+        this.port = port;
     }
 
     /**
@@ -27,7 +28,7 @@ public class Main {
      *
      * @throws IOException
      */
-    public Main() throws IOException {
+    public ServerTcp() throws IOException {
         this(12345);
     }
 
@@ -44,7 +45,7 @@ public class Main {
         str = br.readLine();
 
         if (str.toLowerCase().equals("tcp")) {
-            this.launchTcpServer();
+            this.communicationClientTcp();
         } else if (str.toLowerCase().equals("udp")) {
             this.launchUdpServer();
         }
@@ -52,17 +53,23 @@ public class Main {
     }
 
     /**
-     * Méthode permettant de lancer le serveur de communication TCP.
+     * Méthode permettant de communiquer avec le client sur le serveur TCP.
      */
-    private void launchTcpServer() {
-        ServerTcp tcp_server = new ServerTcp();
+    private void communicationClientTcp() {
+
     }
 
     /**
      * Méthode permettant de lancer le serveur de communication UDP.
      */
     private void launchUdpServer() {
-        ServerUdp udp_server = new ServerUdp();
+        try {
+            ServerUdp udp_server = new ServerUdp(this.port);
+            udp_server.launch();
+            udp_server.shutdown();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     /**
@@ -75,7 +82,7 @@ public class Main {
     }
 
     public static void main(String args[]) throws IOException {
-        Main ss = new Main();
+        ServerTcp ss = new ServerTcp();
         ss.launch();
         ss.shutdown();
     }
