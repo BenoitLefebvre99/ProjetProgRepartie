@@ -1,6 +1,5 @@
 package server.tcp;
 
-import com.sun.security.ntlm.Client;
 import server.util.AllowList;
 import server.util.ClientResponse;
 import server.util.Idc;
@@ -51,6 +50,8 @@ public class ServerTcp {
         if(this.allowList.contains(cr.getIdc())) {
             if(cr.isKeepAlive()){
                 this.send(cr.getCryptedMessage(), socket_client);
+            } else {
+                this.send("Déconnexion.", socket_client);
             }
         } else {
             this.send("Accès réfusé, cet IDC n'existe pas.", socket_client);
