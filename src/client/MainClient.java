@@ -1,16 +1,28 @@
 package client;
 
 import client.util.ServerInit;
+import client.util.UncryptedMessage;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 
 public class MainClient {
-    private Socket socket_client;
+    private SocketChannel socket_client;
     private String address;
     private int port;
     private String protocol;
     private ServerInit server;
+    private ByteBuffer buf;
+    private UncryptedMessage noncrypte;
 
     /**
      * Constructeur permettant de créer le client pour une connexion par défaut (localhost:12345)
@@ -30,90 +42,96 @@ public class MainClient {
         this.port = port;
         this.socket_client = null;
         this.protocol = "";
+        this.resetBuffer();
+        this.noncrypte = new UncryptedMessage();
     }
 
     /**
      * Methode connectant le client au server.
      */
-    public void connect() {
-        String tmp;
+    public void launch() {
         try {
+            System.out.println(">> Connexion au serveur principal : '" + this.address + ":" + this.port + "'.");
             this.chooseProtocol();
-            this.socket_client = new Socket(this.address, this.port);
+            this.connexionServer();
             this.send(this.protocol);
-            tmp = this.receive();
-            this.server = new ServerInit(tmp);
-            this.socket_client = new Socket(this.address, this.server.getPort());
+            this.server = new ServerInit(this.receive());
+            this.disconnect();
+            if(this.server.getKeepAlive()) {
+                this.port = this.server.getPort();
+                this.connexionServer();
+                this.send(this.getMessage());
+            }
+            //tmp = this.receive();
+            //System.out.println(tmp);
+
+            //this.socket_client = new Socket(this.address, this.server.getPort());
         } catch (Exception e) {
-            System.out.println("Accès refusé.");
+
+            System.out.println("Accès refusé. " + e.getMessage());
         }
     }
 
     /**
-     * Méthode renvoyant la réponse brute du serveur.
-     * @return String Réponse du serveur.
+     * Méthode permettant la connexion au serveur désiré.
+     * @throws IOException
+     */
+    private void connexionServer() throws IOException {
+        this.socket_client = SocketChannel.open();
+        this.socket_client.connect(new InetSocketAddress(this.address, this.port));
+        System.out.println(">> Connecté au serveur '" + this.address + ":" + this.port + "'.\n");
+    }
+
+    /**
+     * Méthode permettant de récupérer la réponse du client sous forme de String.
+     * @return String réponse du Serveur
      * @throws IOException
      */
     private String receive() throws IOException {
-        InputStream in = this.socket_client.getInputStream();
-        String res="";
-        int c;
-        while((c = in.read()) != -1)
-            res += (char) c;
-        return res;
+        this.resetBuffer();
+        this.socket_client.read(this.buf);
+        return new String(this.buf.array()).trim();
     }
 
     /**
-     * Méthode permettant d'envoyer un message au serveur.
+     * Méthode permettant d'obtenir l'accès au serveur de cryptage en demandant au serveur d'accueil.
+     *
      * @throws IOException
      */
     private void send(String str) throws IOException {
-        OutputStream os = this.socket_client.getOutputStream();
-        PrintWriter pw = new PrintWriter(os, true);
-        pw.println(str);
+        this.buf = ByteBuffer.allocate(str.length() * 8);
+        this.buf = ByteBuffer.wrap(str.getBytes());
+        this.socket_client.write(this.buf);
     }
 
+    private void resetBuffer() {
+        this.buf = ByteBuffer.allocate(2048);
+    }
     /**
      * Méthode demandant au client le protocol à utiliser.
+     *
      * @throws IOException
      */
     private void chooseProtocol() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Veuillez choisir le protocole à utiliser pour se connecter au '"
-                + this.address + ':' + this.port + "'.");
+        System.out.println(">> Veuillez choisir le protocole à utiliser pour se connecter au serveur de cryptage.");
         do {
-            System.out.print(">> udp ou tcp ?");
+            System.out.print("> udp ou tcp ? ");
             this.protocol = br.readLine();
             System.out.print("\n");
-        } while(!this.protocol.toLowerCase().equals("udp")
+        } while (!this.protocol.toLowerCase().equals("udp")
                 && !this.protocol.toLowerCase().equals("tcp"));
     }
 
     /**
      * Méthode lisant le message à envoyer au client.
+     *
      * @return String message à envoyer
      * @throws IOException
      */
     private String getMessage() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Quel est le message ?");
-        String res = "";
-        do {
-            res += br.readLine();
-        } while(!res.contains("\r"));
-        return res;
-    }
-
-    /**
-     * Méthode gérant un échange de la discussion.
-     */
-    public void conversation() {
-        try {
-            this.send(this.getMessage());
-            System.out.println(">> crypted : " + this.getMessage());
-        } catch(Exception e) {
-            System.out.print(e.getMessage());
-        }
+        this.noncrypte.saisie();
+        return this.server.getIdc() + ":" + this.noncrypte.getShift() + ":" + this.noncrypte.getMessage();
     }
 
     /**
@@ -127,10 +145,7 @@ public class MainClient {
         MainClient mc;
         if (args.length == 0) mc = new MainClient();
         else mc = new MainClient(args[0], Integer.parseInt(args[1]));
-        mc.connect();
-        while(mc.server.getKeepAlive()) {
-            mc.conversation();
-        }
+        mc.launch();
         mc.disconnect();
     }
 }

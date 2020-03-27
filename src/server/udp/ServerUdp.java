@@ -13,7 +13,7 @@ import java.net.SocketException;
 public class ServerUdp {
     public final static int MAX = 100;
 
-    private DatagramSocket server_socket;
+    //private DatagramSocket server_socket;
     private int port;
     private AllowList allowList;
 
@@ -26,10 +26,10 @@ public class ServerUdp {
      */
     public ServerUdp(int port) throws SocketException {
         this.port = port;
-        this.server_socket = new DatagramSocket(this.port);
+        //this.server_socket = new DatagramSocket(this.port);
         this.allowList = new AllowList();
         this.addressClient = null;
-        this.port = 0;
+        this.portClient = 0;
     }
 
     /**
@@ -37,7 +37,7 @@ public class ServerUdp {
      * @throws SocketException
      */
     public ServerUdp() throws SocketException {
-        this(7777);
+        this(12347);
     }
 
     /**
@@ -51,9 +51,17 @@ public class ServerUdp {
     }
 
     /**
+     * Méthode renvoyant le port du serveur de cryptage UDP.
+     * @return int port
+     */
+    public int getPort() {
+        return this.port;
+    }
+
+    /**
      * Méthode permettant de lancer le serveur UDP.
      */
-    public void launch() {
+   /* public void launch() {
         try {
             ClientResponse cr = new ClientResponse(this.receive());
             if(this.allowList.contains(cr.getIdc())){
@@ -68,26 +76,26 @@ public class ServerUdp {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     /**
      * Méthode permettant de recevoir un message de la part du client.
      * @return String message reçu.
      */
-    private String receive() throws IOException {
+    /*private String receive() throws IOException {
         DatagramPacket dgp = new DatagramPacket(new byte[MAX], MAX);
         this.server_socket.receive(dgp);
         this.addressClient = dgp.getAddress();
         this.portClient = dgp.getPort();
         return new String(dgp.getData(), 0, dgp.getLength());
-    }
+    }*/
 
     /**
      * Méthode envoyant un message au client.
      * @param str String
      * @throws IOException
      */
-    private void send(String str) throws IOException {
+   /* private void send(String str) throws IOException {
         byte[] buf = new byte[1];
         int taille;
         DatagramPacket dgp = new DatagramPacket(buf,1, this.addressClient, this.portClient);
@@ -98,13 +106,13 @@ public class ServerUdp {
             this.server_socket.send(dgp);
         }
         this.server_socket.send(dgp);
-    }
+    }*/
 
     /**
      * Méthode permettant d'éteindre le serveur UDP.
      */
-    public void shutdown() {
+   /* public void shutdown() {
         this.server_socket.close();
-    }
+    }*/
 
 }

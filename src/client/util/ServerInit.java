@@ -26,9 +26,9 @@ public class ServerInit {
             String tmp;
             tmp = brut.substring(0, brut.indexOf(':'));
             this.idc = Long.parseLong(tmp);
-            tmp = brut.substring(brut.indexOf(':'), brut.lastIndexOf(':'));
+            tmp = brut.substring(brut.indexOf(':') + 1, brut.lastIndexOf(':'));
             this.protocole = tmp;
-            tmp = brut.substring(brut.lastIndexOf(':'));
+            tmp = brut.substring(brut.lastIndexOf(':') + 1);
             this.port = Integer.parseInt(tmp);
         } catch (Exception e) {
             this.keepAlive = false;

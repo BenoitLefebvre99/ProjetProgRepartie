@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerTcp {
-    private ServerSocket socket_server;
     private int port;
     private AllowList allowList;
 
@@ -20,7 +19,6 @@ public class ServerTcp {
      * @throws IOException
      */
     public ServerTcp(int port) throws IOException {
-        this.socket_server = new ServerSocket(port);
         this.port = port;
         this.allowList = new AllowList();
     }
@@ -31,7 +29,7 @@ public class ServerTcp {
      * @throws IOException
      */
     public ServerTcp() throws IOException {
-        this(6666);
+        this(12346);
     }
 
     /**
@@ -39,8 +37,7 @@ public class ServerTcp {
      *
      * @throws IOException
      */
-    public void launch() throws IOException {
-        Socket socket_client = socket_server.accept();
+    /*public void launch() throws IOException {
         InputStreamReader isr = new InputStreamReader(socket_client.getInputStream());
         BufferedReader br = new BufferedReader(isr);
         String str;
@@ -57,7 +54,7 @@ public class ServerTcp {
             this.send("Accès réfusé, cet IDC n'existe pas.", socket_client);
         }
         socket_client.close();
-    }
+    }*/
 
     /**
      * Méthode permettant d'envoyant une string au client.
@@ -82,11 +79,19 @@ public class ServerTcp {
     }
 
     /**
+     * Méthode renvoyant le port du serveur de cryptage TCP.
+     * @return int port
+     */
+    public int getPort() {
+        return this.port;
+    }
+
+    /**
      * Méthode permettant d'éteindre le serveur.
      *
      * @throws IOException
      */
-    public void shutdown() throws IOException {
+    /*public void shutdown() throws IOException {
         this.socket_server.close();
-    }
+    }*/
 }
