@@ -57,15 +57,12 @@ public class MainClient {
             this.send(this.protocol);
             this.server = new ServerInit(this.receive());
             this.disconnect();
-            if(this.server.getKeepAlive()) {
-                this.port = this.server.getPort();
-                this.connexionServer();
+            this.port = this.server.getPort();
+            this.connexionServer();
+            while(this.server.getKeepAlive()) {
                 this.send(this.getMessage());
+                System.out.println(this.receive());
             }
-            //tmp = this.receive();
-            //System.out.println(tmp);
-
-            //this.socket_client = new Socket(this.address, this.server.getPort());
         } catch (Exception e) {
 
             System.out.println("Accès refusé. " + e.getMessage());

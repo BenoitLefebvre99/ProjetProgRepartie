@@ -51,14 +51,12 @@ public class UncryptedMessage {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println(">> Quel est le message ?\n");
         String res = "";
-        do {
-            res += br.readLine();
-        } while (!res.contains("\r"));
+        res = br.readLine();
         this.setMessage(res);
         do {
             System.out.print(">> Quel est le pas à appliquer (shift) ? ");
             res = br.readLine();
-        } while (this.isInteger(res));
+        } while (!this.isInteger(res));
         this.setShift(Integer.parseInt(res));
     }
 

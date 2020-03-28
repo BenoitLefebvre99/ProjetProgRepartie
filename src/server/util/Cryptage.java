@@ -1,7 +1,5 @@
 package server.util;
 
-import java.util.Random;
-
 public class Cryptage {
     public final int MAX_MSG_LENGTH = 100;
 
@@ -24,7 +22,7 @@ public class Cryptage {
      * Méthode cryptant le message contenu dans this.before.
      */
     private void crypt() {
-        int max = Math.max(this.before.length(), MAX_MSG_LENGTH);
+        int max = Math.min(this.before.length(), MAX_MSG_LENGTH);
         this.after = "";
         char c;
         for(int index = 0; index < max; index++) {

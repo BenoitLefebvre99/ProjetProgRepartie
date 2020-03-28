@@ -2,6 +2,8 @@ package server;
 
 import server.tcp.ServerTcp;
 import server.udp.ServerUdp;
+import server.util.ClientResponse;
+import server.util.Cryptage;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -96,8 +98,10 @@ public class MainServer {
                         this.register(socketChannel);
                     } else if (this.tcp_server.getPort() == portSelected) {
                         System.out.println(">> Client sur le serveur de cryptage TCP");
+                        this.register(socketChannel);
                     } else if (this.udp_server.getPort() == portSelected) {
                         System.out.println(">> Client sur le serveur de cryptage UDP");
+                        this.register(socketChannel);
                     }
                 }
 
@@ -113,9 +117,12 @@ public class MainServer {
                         System.out.println(">> Client déconnecté du serveur d'accueil.");
                         this.buf.clear();
                     } else if (this.tcp_server.getPort() == portSelected) {
-                        /*client.read(this.buf);
+                        client.read(this.buf);
                         System.out.println(new String(this.buf.array()).trim());
-                        this.buf.clear();*/
+                        ClientResponse work = new ClientResponse(new String(this.buf.array()).trim());
+                        System.out.println(work.getCryptedMessage());
+                        client.write(ByteBuffer.wrap(work.getCryptedMessage().getBytes()));
+                        this.buf.clear();
                     } else if (this.udp_server.getPort() == portSelected) {
                     }
                 }
@@ -124,6 +131,10 @@ public class MainServer {
         }
     }
 
+    /**
+     * Traitement de la demande d'autorisation de connexion auprès du serveur de cryptage.
+     * @return Message à envoyer au client.
+     */
     private String traitementRead() {
         String reception = new String(this.buf.array()).trim().toLowerCase();
         if(reception.equals("tcp")) {
