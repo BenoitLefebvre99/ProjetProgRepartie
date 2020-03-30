@@ -30,7 +30,7 @@ public class MainServer {
         this.port = port;
         this.tcp_server = new ServerTcp();
         this.udp_server = new ServerUdp();
-        this.buf = ByteBuffer.allocate(2048);
+        this.resetBuffer();
     }
 
     /**
@@ -94,6 +94,7 @@ public class MainServer {
                         if (this.port == portSelected) {
                             this.redirection(client);
                         } else if (this.tcp_server.getPort() == portSelected) {
+                            this.resetBuffer();
                             client.read(this.buf);
                             this.tcp_server.answer(new String(this.buf.array()).trim(), client);
                             this.buf.clear();
@@ -108,12 +109,19 @@ public class MainServer {
     }
 
     /**
+     * Méthode permettant de remettre à zéro le buffer.
+     */
+    private void resetBuffer(){
+        this.buf = ByteBuffer.allocate(2048);
+    }
+    /**
      * Méthode permettant de rediriger le client vers un serveur de cryptage.
      *
      * @param client client à rediriger
      * @throws IOException
      */
     private void redirection(SocketChannel client) throws IOException {
+        this.resetBuffer();
         client.read(this.buf);
         String res = this.traitementRead();
         this.buf.clear();
