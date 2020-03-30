@@ -2,16 +2,11 @@ package server;
 
 import server.tcp.ServerTcp;
 import server.udp.ServerUdp;
-import server.util.ClientResponse;
-import server.util.Cryptage;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -69,7 +64,7 @@ public class MainServer {
         try {
             this.configureMainServer();
             this.launchTCPServer();
-            this.launchUdpServer();
+            this.launchUDPServer();
             System.out.println(">> Tous les serveurs sont démarrés.");
             this.gestionConnexions();
         } catch (Exception e) {
@@ -90,40 +85,21 @@ public class MainServer {
             while (iter.hasNext()) {
                 SelectionKey key = (SelectionKey) iter.next();
                 if (key.isAcceptable()) {
-                    SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
-                    socketChannel.configureBlocking(false);
-                    int portSelected = socketChannel.socket().getLocalPort();
-                    if(this.port == portSelected) {
-                        System.out.println(">> Client sur le serveur d'accueil");
-                        this.register(socketChannel);
-                    } else if (this.tcp_server.getPort() == portSelected) {
-                        System.out.println(">> Client sur le serveur de cryptage TCP");
-                        this.register(socketChannel);
-                    } else if (this.udp_server.getPort() == portSelected) {
-                        System.out.println(">> Client sur le serveur de cryptage UDP");
-                        this.register(socketChannel);
-                    }
+                    this.registerKey(key);
                 }
-
                 if (key.isReadable()) {
-                    SocketChannel client = (SocketChannel) key.channel();
-                    int portSelected = client.socket().getLocalPort();
-                    if(this.port == portSelected) {
-                        client.read(this.buf);
-                        String res = this.traitementRead();
-                        this.buf.clear();
-                        client.write(ByteBuffer.wrap(res.getBytes()));
-                        client.close();
-                        System.out.println(">> Client déconnecté du serveur d'accueil.");
-                        this.buf.clear();
-                    } else if (this.tcp_server.getPort() == portSelected) {
-                        client.read(this.buf);
-                        System.out.println(new String(this.buf.array()).trim());
-                        ClientResponse work = new ClientResponse(new String(this.buf.array()).trim());
-                        System.out.println(work.getCryptedMessage());
-                        client.write(ByteBuffer.wrap(work.getCryptedMessage().getBytes()));
-                        this.buf.clear();
-                    } else if (this.udp_server.getPort() == portSelected) {
+                    if (key.channel() instanceof SocketChannel) {
+                        SocketChannel client = (SocketChannel) key.channel();
+                        int portSelected = client.socket().getLocalPort();
+                        if (this.port == portSelected) {
+                            this.redirection(client);
+                        } else if (this.tcp_server.getPort() == portSelected) {
+                            client.read(this.buf);
+                            this.tcp_server.answer(new String(this.buf.array()).trim(), client);
+                            this.buf.clear();
+                        }
+                    } else {
+                        this.udp_server.answer(key);
                     }
                 }
                 iter.remove();
@@ -132,12 +108,51 @@ public class MainServer {
     }
 
     /**
+     * Méthode permettant de rediriger le client vers un serveur de cryptage.
+     *
+     * @param client client à rediriger
+     * @throws IOException
+     */
+    private void redirection(SocketChannel client) throws IOException {
+        client.read(this.buf);
+        String res = this.traitementRead();
+        this.buf.clear();
+        client.write(ByteBuffer.wrap(res.getBytes()));
+        client.close();
+        System.out.println(">> Client déconnecté du serveur d'accueil.");
+        this.buf.clear();
+    }
+
+    /**
+     * Méhode permettant d'identifier et d'enregistrer une connexion.
+     *
+     * @param key connexion
+     * @throws IOException
+     */
+    private void registerKey(SelectionKey key) throws IOException {
+        SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
+        socketChannel.configureBlocking(false);
+        int portSelected = socketChannel.socket().getLocalPort();
+        if (this.port == portSelected) {
+            System.out.println(">> Client sur le serveur d'accueil");
+            this.register(socketChannel);
+        } else if (this.tcp_server.getPort() == portSelected) {
+            System.out.println(">> Client sur le serveur de cryptage TCP");
+            this.register(socketChannel);
+        } else if (this.udp_server.getPort() == portSelected) {
+            System.out.println(">> Client sur le serveur de cryptage UDP");
+            this.udp_server.register_udp(this.selector);
+        }
+    }
+
+    /**
      * Traitement de la demande d'autorisation de connexion auprès du serveur de cryptage.
+     *
      * @return Message à envoyer au client.
      */
     private String traitementRead() {
         String reception = new String(this.buf.array()).trim().toLowerCase();
-        if(reception.equals("tcp")) {
+        if (reception.equals("tcp")) {
             System.out.println(">> Demande d'accès au serveur de cryptage TCP ...");
             return this.tcp_server.newIdc();
         } else if (reception.equals("udp")) {
@@ -153,26 +168,24 @@ public class MainServer {
      * Méthode permettant de lancer le serveur de communication TCP.
      */
     private void launchTCPServer() throws IOException {
-        this.socket_server = ServerSocketChannel.open();
-        this.socket_server.configureBlocking(false);
-        this.socket_server.socket().bind(new InetSocketAddress(this.tcp_server.getPort()));
-        this.socket_server.register(selector, SelectionKey.OP_ACCEPT);
-        System.out.println("> Serveur de cryptage TCP ouvert sur le port : '" + this.tcp_server.getPort() + "'.");
-    }
-
-    private void register(SocketChannel socketChannel) throws IOException {
-        socketChannel.register(selector, SelectionKey.OP_READ);
+        this.tcp_server.launch(this.selector);
     }
 
     /**
      * Méthode permettant de lancer le serveur de communication UDP.
      */
-    private void launchUdpServer() throws IOException {
-        this.socket_server = ServerSocketChannel.open();
-        this.socket_server.configureBlocking(false);
-        this.socket_server.socket().bind(new InetSocketAddress(this.udp_server.getPort()));
-        this.socket_server.register(selector, SelectionKey.OP_ACCEPT);
-        System.out.println("> Serveur de cryptage UDP ouvert sur le port : '" + this.udp_server.getPort() + "'.");
+    private void launchUDPServer() throws IOException {
+        this.udp_server.launch(this.selector);
+    }
+
+    /**
+     * Méthode permettant d'enregistrer le client tcp.
+     *
+     * @param socketChannel
+     * @throws IOException
+     */
+    private void register(SocketChannel socketChannel) throws IOException {
+        socketChannel.register(selector, SelectionKey.OP_READ);
     }
 
     /**
@@ -182,8 +195,6 @@ public class MainServer {
      */
     public void shutdown() throws IOException {
         this.socket_server.close();
-        //this.tcp_server.shutdown();
-        //this.udp_server.shutdown();
     }
 
     public static void main(String args[]) throws IOException {

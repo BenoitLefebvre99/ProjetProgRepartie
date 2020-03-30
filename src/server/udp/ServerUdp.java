@@ -5,20 +5,17 @@ import server.util.ClientResponse;
 import server.util.Idc;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.*;
 
 public class ServerUdp {
     public final static int MAX = 100;
 
-    //private DatagramSocket server_socket;
     private int port;
     private AllowList allowList;
-
-    private InetAddress addressClient;
-    private int portClient;
+    private DatagramChannel datagram_server;
+    private ByteBuffer buf;
 
     /**
      * Constructeur créant un serveur UDP au port souhaité.
@@ -26,10 +23,7 @@ public class ServerUdp {
      */
     public ServerUdp(int port) throws SocketException {
         this.port = port;
-        //this.server_socket = new DatagramSocket(this.port);
         this.allowList = new AllowList();
-        this.addressClient = null;
-        this.portClient = 0;
     }
 
     /**
@@ -61,58 +55,39 @@ public class ServerUdp {
     /**
      * Méthode permettant de lancer le serveur UDP.
      */
-   /* public void launch() {
-        try {
-            ClientResponse cr = new ClientResponse(this.receive());
-            if(this.allowList.contains(cr.getIdc())){
-                if(cr.isKeepAlive()) {
-                    this.send(cr.getCryptedMessage());
-                } else {
-                    this.send("Déconnexion.");
-                }
-            } else {
-                this.send("Accès réfusé, cet IDC n'existe pas.");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
+    public void launch(Selector selector) throws IOException {
+        this.datagram_server = DatagramChannel.open();
+        datagram_server.configureBlocking(false);
+        datagram_server.socket().bind(new InetSocketAddress(this.port));
+        datagram_server.register(selector, SelectionKey.OP_READ);
+        System.out.println("> Serveur de cryptage UDP ouvert sur le port : '" + this.port + "'.");
+    }
 
     /**
-     * Méthode permettant de recevoir un message de la part du client.
-     * @return String message reçu.
-     */
-    /*private String receive() throws IOException {
-        DatagramPacket dgp = new DatagramPacket(new byte[MAX], MAX);
-        this.server_socket.receive(dgp);
-        this.addressClient = dgp.getAddress();
-        this.portClient = dgp.getPort();
-        return new String(dgp.getData(), 0, dgp.getLength());
-    }*/
-
-    /**
-     * Méthode envoyant un message au client.
-     * @param str String
+     * Méthode permettant de traiter la demande du client
+     *
      * @throws IOException
      */
-   /* private void send(String str) throws IOException {
-        byte[] buf = new byte[1];
-        int taille;
-        DatagramPacket dgp = new DatagramPacket(buf,1, this.addressClient, this.portClient);
-        buf = str.getBytes();
-        for (int pas = 0; pas < buf.length; pas += MAX) {
-            taille = Math.min(buf.length - pas, MAX);
-            dgp.setData(buf, pas, taille);
-            this.server_socket.send(dgp);
+    public void answer(SelectionKey key) throws IOException {
+        this.datagram_server = (DatagramChannel) key.channel();
+        this.buf = ByteBuffer.allocate(2048);
+        SocketAddress add = this.datagram_server.receive(this.buf);
+        ClientResponse work = new ClientResponse(new String(this.buf.array()).trim());
+        System.out.println(work.getCryptedMessage());
+        String res;
+        if (this.allowList.contains(work.getIdc())) {
+            if (work.isKeepAlive()) {
+                res = work.getCryptedMessage();
+            } else {
+                res = ">> Déconnexion du client.";
+            }
+        } else {
+            res = "Accès réfusé, cet IDC n'existe pas sur le serveur UDP.";
         }
-        this.server_socket.send(dgp);
-    }*/
+        this.datagram_server.send(ByteBuffer.wrap(res.getBytes()), add);
+    }
 
-    /**
-     * Méthode permettant d'éteindre le serveur UDP.
-     */
-   /* public void shutdown() {
-        this.server_socket.close();
-    }*/
-
+    public void register_udp(Selector selector) throws ClosedChannelException {
+        this.datagram_server.register(selector, SelectionKey.OP_READ);
+    }
 }

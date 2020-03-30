@@ -5,8 +5,12 @@ import server.util.ClientResponse;
 import server.util.Idc;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 public class ServerTcp {
     private int port;
@@ -37,39 +41,46 @@ public class ServerTcp {
      *
      * @throws IOException
      */
-    /*public void launch() throws IOException {
-        InputStreamReader isr = new InputStreamReader(socket_client.getInputStream());
-        BufferedReader br = new BufferedReader(isr);
-        String str;
-        str = br.readLine();
-
-        ClientResponse cr = new ClientResponse(str);
-        if(this.allowList.contains(cr.getIdc())) {
-            if(cr.isKeepAlive()){
-                this.send(cr.getCryptedMessage(), socket_client);
-            } else {
-                this.send("Déconnexion.", socket_client);
-            }
-        } else {
-            this.send("Accès réfusé, cet IDC n'existe pas.", socket_client);
-        }
-        socket_client.close();
+    public void launch(Selector selector) throws IOException {
+        ServerSocketChannel socket_server = ServerSocketChannel.open();
+        socket_server.configureBlocking(false);
+        socket_server.socket().bind(new InetSocketAddress(this.port));
+        socket_server.register(selector, SelectionKey.OP_ACCEPT);
+        System.out.println("> Serveur de cryptage TCP ouvert sur le port : '" + this.port + "'.");
+    }
+    /*public void launch(Selector selector, ServerSocketChannel socket_server) throws IOException {
+        socket_server = ServerSocketChannel.open();
+        socket_server.configureBlocking(false);
+        socket_server.socket().bind(new InetSocketAddress(this.port));
+        socket_server.register(selector, SelectionKey.OP_ACCEPT);
+        System.out.println("> Serveur de cryptage TCP ouvert sur le port : '" + this.port + "'.");
     }*/
 
     /**
-     * Méthode permettant d'envoyant une string au client.
-     * @param str string a envoyer
-     * @param socket_client Socket du client
+     * Méthode permettant de traiter la demande du client
+     *
+     * @param client_message message brut du client
+     * @param client         socket du client
      * @throws IOException
      */
-    private void send(String str, Socket socket_client) throws IOException {
-        OutputStream os = socket_client.getOutputStream();
-        PrintWriter print = new PrintWriter(os, true);
-        print.println(str);
+    public void answer(String client_message, SocketChannel client) throws IOException {
+        ClientResponse work = new ClientResponse(client_message);
+        String res;
+        if (this.allowList.contains(work.getIdc())) {
+            if (work.isKeepAlive()) {
+                res = work.getCryptedMessage();
+            } else {
+                res = ">> Déconnexion du client.";
+            }
+        } else {
+            res = "Accès réfusé, cet IDC n'existe pas sur le serveur TCP.";
+        }
+        client.write(ByteBuffer.wrap(res.getBytes()));
     }
 
     /**
      * Méthode permettant de générer un nouvel idc.
+     *
      * @return String "IDC:PROTOCOLE:PORT"
      */
     public String newIdc() {
@@ -80,18 +91,10 @@ public class ServerTcp {
 
     /**
      * Méthode renvoyant le port du serveur de cryptage TCP.
+     *
      * @return int port
      */
     public int getPort() {
         return this.port;
     }
-
-    /**
-     * Méthode permettant d'éteindre le serveur.
-     *
-     * @throws IOException
-     */
-    /*public void shutdown() throws IOException {
-        this.socket_server.close();
-    }*/
 }

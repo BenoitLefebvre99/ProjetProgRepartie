@@ -4,19 +4,14 @@ import client.util.ServerInit;
 import client.util.UncryptedMessage;
 
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
+import java.net.*;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 
 public class MainClient {
     private SocketChannel socket_client;
+    private DatagramChannel data_channel;
     private String address;
     private int port;
     private String protocol;
@@ -41,7 +36,8 @@ public class MainClient {
         this.address = address;
         this.port = port;
         this.socket_client = null;
-        this.protocol = "";
+        this.data_channel = null;
+        this.protocol = "tcp";
         this.resetBuffer();
         this.noncrypte = new UncryptedMessage();
     }
@@ -52,42 +48,65 @@ public class MainClient {
     public void launch() {
         try {
             System.out.println(">> Connexion au serveur principal : '" + this.address + ":" + this.port + "'.");
-            this.chooseProtocol();
+            String prot = this.chooseProtocol();
             this.connexionServer();
-            this.send(this.protocol);
-            this.server = new ServerInit(this.receive());
+            this.protocol = prot;
+            this.send(this.protocol, "tcp");
+            this.server = new ServerInit(this.receive("tcp"));
             this.disconnect();
             this.port = this.server.getPort();
             this.connexionServer();
-            while(this.server.getKeepAlive()) {
-                this.send(this.getMessage());
-                System.out.println(this.receive());
+            while (this.server.getKeepAlive()) {
+                this.barpresentation();
+                this.send(this.getMessage(), this.protocol);
+                System.out.println("\n>>> Message crypté : " + this.receive(this.protocol) + "\n");
+                this.barpresentation();
             }
         } catch (Exception e) {
-
-            System.out.println("Accès refusé. " + e.getMessage());
+            System.out.println("Le serveur a coupé la communication. ");
         }
     }
 
     /**
      * Méthode permettant la connexion au serveur désiré.
+     *
      * @throws IOException
      */
     private void connexionServer() throws IOException {
-        this.socket_client = SocketChannel.open();
-        this.socket_client.connect(new InetSocketAddress(this.address, this.port));
-        System.out.println(">> Connecté au serveur '" + this.address + ":" + this.port + "'.\n");
+        if (this.protocol.toLowerCase().equals("tcp")) {
+            this.socket_client = SocketChannel.open();
+            this.socket_client.connect(new InetSocketAddress(this.address, this.port));
+            System.out.println(">> Connecté au serveur '" + this.address + ":" + this.port + "'.\n");
+        } else if (this.protocol.toLowerCase().equals("udp")) {
+            this.data_channel = DatagramChannel.open();
+            SocketAddress address = new InetSocketAddress(0);
+            DatagramSocket socket = data_channel.socket();
+            socket.bind(address);
+        }
     }
 
     /**
      * Méthode permettant de récupérer la réponse du client sous forme de String.
+     *
      * @return String réponse du Serveur
      * @throws IOException
      */
-    private String receive() throws IOException {
+    private String receive(String str) throws IOException {
         this.resetBuffer();
-        this.socket_client.read(this.buf);
+        if (str.toLowerCase().equals("tcp")) {
+            this.socket_client.read(this.buf);
+        } else if (str.toLowerCase().equals("udp")) {
+            this.data_channel.receive(this.buf);
+        }
+        this.buf.flip();
         return new String(this.buf.array()).trim();
+    }
+
+    /**
+     * Méthode permettant d'afficher une bar de présentation.
+     */
+    private void barpresentation() {
+        System.out.println("\n*******************************************************\n");
     }
 
     /**
@@ -95,29 +114,37 @@ public class MainClient {
      *
      * @throws IOException
      */
-    private void send(String str) throws IOException {
+    private void send(String str, String protocol) throws IOException {
         this.buf = ByteBuffer.allocate(str.length() * 8);
         this.buf = ByteBuffer.wrap(str.getBytes());
-        this.socket_client.write(this.buf);
+        if (protocol.toLowerCase().equals("tcp")) {
+            this.socket_client.write(this.buf);
+        } else if (protocol.toLowerCase().equals("udp")) {
+            SocketAddress server = new InetSocketAddress(this.address, this.port);
+            this.data_channel.send(this.buf, server);
+        }
     }
 
     private void resetBuffer() {
         this.buf = ByteBuffer.allocate(2048);
     }
+
     /**
      * Méthode demandant au client le protocol à utiliser.
      *
      * @throws IOException
      */
-    private void chooseProtocol() throws IOException {
+    private String chooseProtocol() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println(">> Veuillez choisir le protocole à utiliser pour se connecter au serveur de cryptage.");
+        String res = "";
         do {
             System.out.print("> udp ou tcp ? ");
-            this.protocol = br.readLine();
+            res = br.readLine();
             System.out.print("\n");
-        } while (!this.protocol.toLowerCase().equals("udp")
-                && !this.protocol.toLowerCase().equals("tcp"));
+        } while (!res.toLowerCase().equals("udp")
+                && !res.toLowerCase().equals("tcp"));
+        return res;
     }
 
     /**
@@ -136,6 +163,7 @@ public class MainClient {
      */
     public void disconnect() throws IOException {
         this.socket_client.close();
+        System.out.println(">> Déconnecté du serveur '" + this.address + ":" + this.port + "'.\n");
     }
 
     public static void main(String args[]) throws IOException {
