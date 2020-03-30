@@ -32,6 +32,7 @@ public class ClientResponse {
             this.shift = Integer.parseInt(tmp);
             tmp = brut.substring(brut.lastIndexOf(':') + 1);
             this.before = tmp;
+            if(this.before.equals("")) this.keepAlive = false;
         } catch (Exception e) {
             this.keepAlive = false;
         }

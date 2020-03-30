@@ -93,13 +93,19 @@ public class MainClient {
      */
     private String receive(String str) throws IOException {
         this.resetBuffer();
+        String res;
         if (str.toLowerCase().equals("tcp")) {
             this.socket_client.read(this.buf);
         } else if (str.toLowerCase().equals("udp")) {
             this.data_channel.receive(this.buf);
         }
+        res = new String(this.buf.array()).trim();
+        if(res.equals(">> Déconnexion du client.")
+                || res.equals("Accès réfusé, cet IDC n'existe pas sur le serveur.")) {
+            this.server.stop();
+        }
         this.buf.flip();
-        return new String(this.buf.array()).trim();
+        return res;
     }
 
     /**

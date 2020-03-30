@@ -65,17 +65,17 @@ public class ServerTcp {
      */
     public void answer(String client_message, SocketChannel client) throws IOException {
         ClientResponse work = new ClientResponse(client_message);
-        String res;
         if (this.allowList.contains(work.getIdc())) {
             if (work.isKeepAlive()) {
-                res = work.getCryptedMessage();
+                client.write(ByteBuffer.wrap(work.getCryptedMessage().getBytes()));
             } else {
-                res = ">> Déconnexion du client.";
+                System.out.println(">> Déconnexion du client.");
+                client.write(ByteBuffer.wrap((">> Déconnexion du client.").getBytes()));
+                this.allowList.remove(work.getIdc());
             }
         } else {
-            res = "Accès réfusé, cet IDC n'existe pas sur le serveur TCP.";
+            client.write(ByteBuffer.wrap(("Accès réfusé, cet IDC n'existe pas sur le serveur.").getBytes()));
         }
-        client.write(ByteBuffer.wrap(res.getBytes()));
     }
 
     /**

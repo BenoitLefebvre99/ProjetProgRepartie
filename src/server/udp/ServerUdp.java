@@ -73,18 +73,17 @@ public class ServerUdp {
         this.buf = ByteBuffer.allocate(2048);
         SocketAddress add = this.datagram_server.receive(this.buf);
         ClientResponse work = new ClientResponse(new String(this.buf.array()).trim());
-        System.out.println(work.getCryptedMessage());
-        String res;
         if (this.allowList.contains(work.getIdc())) {
             if (work.isKeepAlive()) {
-                res = work.getCryptedMessage();
+                this.datagram_server.send(ByteBuffer.wrap(work.getCryptedMessage().getBytes()), add);
             } else {
-                res = ">> Déconnexion du client.";
+                System.out.println(">> Déconnexion du client.");
+                this.datagram_server.send(ByteBuffer.wrap((">> Déconnexion du client.").getBytes()), add);
+                this.allowList.remove(work.getIdc());
             }
         } else {
-            res = "Accès réfusé, cet IDC n'existe pas sur le serveur UDP.";
+            this.datagram_server.send(ByteBuffer.wrap(("Accès réfusé, cet IDC n'existe pas sur le serveur.").getBytes()), add);
         }
-        this.datagram_server.send(ByteBuffer.wrap(res.getBytes()), add);
     }
 
     public void register_udp(Selector selector) throws ClosedChannelException {
