@@ -1,10 +1,12 @@
 package server.util;
 
+import server.crypter.Cesar;
+
 public class ClientResponse {
     private long idc;
     private int shift;
     private String before;
-    private Cryptage crypteur;
+    private Cesar crypteur;
     private boolean keepAlive;
 
     /**
@@ -15,7 +17,7 @@ public class ClientResponse {
     public ClientResponse(String reponseBrut) {
         this.keepAlive = true;
         this.cut(reponseBrut);
-        this.crypteur = new Cryptage(this.before, this.shift);
+        this.crypteur = new Cesar(this.before, this.shift);
     }
 
     /**

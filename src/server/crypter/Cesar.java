@@ -1,55 +1,53 @@
-package server.util;
+package server.crypter;
 
-public class Cryptage {
-    public final int MAX_MSG_LENGTH = 100;
-
+public class Cesar implements ICryptage {
     private String before;
     private String after;
     private int shift;
 
     /**
      * Constructeur Cryptage().
+     *
      * @param messageUncoded message non codé.
-     * @param shift pas de cryptage.
+     * @param shift          pas de cryptage.
      */
-    public Cryptage(String messageUncoded, int shift) {
+    public Cesar(String messageUncoded, int shift) {
         this.before = messageUncoded;
         this.shift = shift;
         this.crypt();
     }
 
-    /**
-     * Méthode cryptant le message contenu dans this.before.
-     */
-    private void crypt() {
+    @Override
+    public void crypt() {
         int max = Math.min(this.before.length(), MAX_MSG_LENGTH);
         this.after = "";
         char c;
-        for(int index = 0; index < max; index++) {
-            if(this.alphaChar(this.before.charAt(index))) {
+        for (int index = 0; index < max; index++) {
+            if (this.alphaChar(this.before.charAt(index))) {
                 c = (char) (this.before.charAt(index) + this.shift);
                 if (!(c <= 'z' && c >= 'a') && !(c <= 'Z' && c >= 'A')) {
                     if (c < 'A') {
-                        c = (char) ('Z' + this.shift);
+                        c = (char) ('Z' - ('A' - c - 1));
                     } else if (c > 'Z' && c < 'a') {
                         if (this.shift > 0) {
-                            c = (char) ('A' + this.shift);
+                            c = (char) ('A' + (c - 'Z' - 1));
                         } else {
-                            c = (char) ('z' + this.shift);
+                            c = (char) ('z' - ('a' - c - 1));
                         }
                     } else {
-                        c = (char) ('a' + this.shift);
+                        c = (char) ('a' + (c - 'z' - 1));
                     }
                 }
                 this.after += c;
             } else {
-             this.after += this.before.charAt(index);
+                this.after += this.before.charAt(index);
             }
         }
     }
 
     /**
      * Méthode privée permettant de savoir si le caractère est compris dans ['a','z'] ou ['A','Z'].
+     *
      * @param c caractère à tester
      * @return true si dans un des intervalles.
      */
@@ -57,19 +55,7 @@ public class Cryptage {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
-    /**
-     * Méthode permettant de changer le message à coder.
-     * @param uncoded message non codé.
-     */
-    public void setMessage(String uncoded) {
-        this.before = uncoded;
-        this.crypt();
-    }
-
-    /**
-     * Méthode permettant de récupérer le message codé.
-     * @return String : msg codé
-     */
+    @Override
     public String getCodedMessage() {
         return this.after;
     }
