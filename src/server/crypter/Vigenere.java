@@ -1,8 +1,5 @@
 package server.crypter;
 
-
-import java.io.IOException;
-
 public class Vigenere implements ICryptage {
     private String before;
     private String after;
@@ -18,7 +15,7 @@ public class Vigenere implements ICryptage {
      */
     public Vigenere(String messageUncoded, String key) {
         this.before = messageUncoded;
-        this.key = key;
+        this.key = this.generateNewKey(key);
         this.vigenereTabU = this.initialiseVigenereTab((int) 'A', (int) 'Z');
         this.vigenereTabL = this.initialiseVigenereTab((int) 'a', (int) 'z');
         this.crypt();
@@ -43,19 +40,39 @@ public class Vigenere implements ICryptage {
                     second = (int) this.before.charAt(i) - 'A';
                     this.after += (char) this.vigenereTabU[first][second];
                     keyPosition++;
-                    if (keyPosition > this.key.length()) keyPosition = 0;
+                    if (keyPosition == this.key.length()) keyPosition = 0;
                 } else if (this.isLowerChar(this.before.charAt(i))) {
                     first = (int) this.key.toLowerCase().charAt(keyPosition) - 'a';
                     second = (int) this.before.charAt(i) - 'a';
                     this.after += (char) this.vigenereTabL[first][second];
                     keyPosition++;
-                    if (keyPosition > this.key.length()) keyPosition = 0;
+                    if (keyPosition == this.key.length()) keyPosition = 0;
                 } else {
                     this.after += this.before.charAt(i);
                 }
-                System.out.print(this.after.charAt(this.after.length()-1));
             }
         }
+    }
+
+    /**
+     * Méthode générant une clé adaptée au message, en la répétant autant de fois qu'il y a de caractères.
+     *
+     * @param oldKey la clé du client
+     * @return nouvelle clé adaptée
+     */
+    public String generateNewKey(String oldKey) {
+        String res = "";
+        int keyPos = 0;
+        for (int idx = 0; idx < this.before.length(); idx++) {
+            if (this.isUpperChar(this.before.charAt(idx)) || this.isLowerChar(this.before.charAt(idx))) {
+                res += oldKey.charAt(keyPos);
+                keyPos++;
+                if (keyPos == oldKey.length()) {
+                    keyPos = 0;
+                }
+            }
+        }
+        return res;
     }
 
     /**
@@ -101,8 +118,8 @@ public class Vigenere implements ICryptage {
         return tab;
     }
 
-    public static void main(String args[]) throws IOException {
-        Vigenere v = new Vigenere("BoNjOuR MeC", "lacle");
-        System.out.print(v.getCodedMessage());
+    public static void main(String[] args) {
+        Vigenere v = new Vigenere("The quick brown fox jumps over 13 lazy dogs.", "cryptii");
+        System.out.println(v.getCodedMessage());
     }
 }

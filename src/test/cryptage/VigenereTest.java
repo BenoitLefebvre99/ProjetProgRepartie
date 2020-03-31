@@ -8,6 +8,12 @@ import static org.junit.Assert.assertEquals;
 public class VigenereTest {
 
     @Test
+    public void testGeneratingKey() {
+        Vigenere v = new Vigenere("Bonjour le monde !", "yes");
+        assertEquals("yesyesyesyesye", v.generateNewKey("yes"));
+    }
+
+    @Test
     public void testNotAlphaChar() {
         Vigenere crypt = new Vigenere(" .;?,/:§!0123456789", "lacle");
         assertEquals(" .;?,/:§!0123456789", crypt.getCodedMessage());

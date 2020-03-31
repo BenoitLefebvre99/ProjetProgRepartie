@@ -48,7 +48,7 @@ public class MainClient {
     public void launch() {
         try {
             System.out.println(">> Connexion au serveur principal : '" + this.address + ":" + this.port + "'.");
-            String prot = this.chooseProtocol();
+            String prot = this.chooseProtocole();
             this.connexionServer();
             this.protocol = prot;
             this.send(this.protocol, "tcp");
@@ -140,7 +140,7 @@ public class MainClient {
      *
      * @throws IOException
      */
-    private String chooseProtocol() throws IOException {
+    private String chooseProtocole() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println(">> Veuillez choisir le protocole à utiliser pour se connecter au serveur de cryptage.");
         String res = "";
