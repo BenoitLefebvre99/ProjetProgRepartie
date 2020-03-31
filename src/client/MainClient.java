@@ -53,6 +53,7 @@ public class MainClient {
             this.protocol = prot;
             this.send(this.protocol, "tcp");
             this.server = new ServerInit(this.receive("tcp"));
+
             this.disconnect();
             this.port = this.server.getPort();
             this.connexionServer();
@@ -91,12 +92,12 @@ public class MainClient {
      * @return String réponse du Serveur
      * @throws IOException
      */
-    private String receive(String str) throws IOException {
+    private String receive(String protocol) throws IOException {
         this.resetBuffer();
         String res;
-        if (str.toLowerCase().equals("tcp")) {
+        if (protocol.toLowerCase().equals("tcp")) {
             this.socket_client.read(this.buf);
-        } else if (str.toLowerCase().equals("udp")) {
+        } else if (protocol.toLowerCase().equals("udp")) {
             this.data_channel.receive(this.buf);
         }
         res = new String(this.buf.array()).trim();

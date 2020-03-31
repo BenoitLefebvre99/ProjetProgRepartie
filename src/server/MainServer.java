@@ -1,5 +1,6 @@
 package server;
 
+import server.crypter.Crypteurs;
 import server.tcp.ServerTcp;
 import server.udp.ServerUdp;
 
@@ -7,6 +8,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -126,6 +128,8 @@ public class MainServer {
         String res = this.traitementRead();
         this.buf.clear();
         client.write(ByteBuffer.wrap(res.getBytes()));
+        EnumSet<Crypteurs> crypteurs = EnumSet.allOf(Crypteurs.class);
+        client.write(ByteBuffer.wrap(crypteurs.toString().getBytes()));
         client.close();
         System.out.println(">> Client déconnecté du serveur d'accueil.");
         this.buf.clear();
