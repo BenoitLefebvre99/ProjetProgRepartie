@@ -48,7 +48,7 @@ public class CrypteursAvailable {
             this.message = this.message.substring(this.message.indexOf(',') + 1);
             return true;
         } else if (this.message.length() > 0) {
-            if(this.listCrypteurs.isEmpty()) toAdd = this.message.substring(0);
+            if (this.listCrypteurs.isEmpty()) toAdd = this.message.substring(0);
             else toAdd = this.message.substring(1);
             this.listCrypteurs.add(toAdd);
             return false;
@@ -79,8 +79,19 @@ public class CrypteursAvailable {
         return res;
     }
 
-    public static void main(String args[]) throws IOException {
-        CrypteursAvailable ca = new CrypteursAvailable("[CESAR, VIGENERE]");
-        System.out.print(ca.toString());
+    /**
+     * Méthode vérifiant que la chaîne de caractères correspond à un crypteur.
+     *
+     * @param res chaîne de caractère à tester
+     * @return true si correspond
+     */
+    public boolean contains(String res) {
+        try {
+            int tmp = Integer.parseInt(res);
+            if (!this.listCrypteurs.get(tmp).isEmpty()) return true;
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

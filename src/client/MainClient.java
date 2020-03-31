@@ -1,5 +1,6 @@
 package client;
 
+import client.util.CrypteursAvailable;
 import client.util.ServerInit;
 import client.util.UncryptedMessage;
 
@@ -16,6 +17,7 @@ public class MainClient {
     private int port;
     private String protocol;
     private ServerInit server;
+    private CrypteursAvailable crypteurs;
     private ByteBuffer buf;
     private UncryptedMessage noncrypte;
 
@@ -43,7 +45,7 @@ public class MainClient {
     }
 
     /**
-     * Methode connectant le client au server.
+     * Methode exécutant toute le programme.
      */
     public void launch() {
         try {
@@ -53,19 +55,38 @@ public class MainClient {
             this.protocol = prot;
             this.send(this.protocol, "tcp");
             this.server = new ServerInit(this.receive("tcp"));
-
+            this.crypteurs = new CrypteursAvailable(this.receive("tcp"));
             this.disconnect();
             this.port = this.server.getPort();
             this.connexionServer();
             while (this.server.getKeepAlive()) {
                 this.barpresentation();
-                this.send(this.getMessage(), this.protocol);
+                int tmp = this.chooseCrypteur();
+                this.send(this.getMessage(tmp), this.protocol);
                 System.out.println("\n>>> Message crypté : " + this.receive(this.protocol) + "\n");
                 this.barpresentation();
             }
         } catch (Exception e) {
             System.out.println("Le serveur a coupé la communication. ");
         }
+    }
+
+    /**
+     * Méthode permettant de faire choisir un crypteur au client.
+     *
+     * @return int du crypteur
+     * @throws IOException
+     */
+    private int chooseCrypteur() throws IOException {
+        System.out.println(this.crypteurs.toString());
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String res = "";
+        do {
+            System.out.print("\n>> Quel crypteur désirez-vous ? ");
+            res = br.readLine();
+            System.out.print("\n");
+        } while (!this.crypteurs.contains(res));
+        return Integer.parseInt(res);
     }
 
     /**
@@ -101,7 +122,7 @@ public class MainClient {
             this.data_channel.receive(this.buf);
         }
         res = new String(this.buf.array()).trim();
-        if(res.equals(">> Déconnexion du client.")
+        if (res.equals(">> Déconnexion du client.")
                 || res.equals("Accès réfusé, cet IDC n'existe pas sur le serveur.")) {
             this.server.stop();
         }
@@ -160,8 +181,9 @@ public class MainClient {
      * @return String message à envoyer
      * @throws IOException
      */
-    private String getMessage() throws IOException {
-        this.noncrypte.saisie();
+    private String getMessage(int crypteur) throws IOException {
+        this.noncrypte.saisie(crypteur);
+        //return this.server.getIdc() + ":" + crypteur + ":" + this.noncrypte.getShift() + ":" + this.noncrypte.getMessage();
         return this.server.getIdc() + ":" + this.noncrypte.getShift() + ":" + this.noncrypte.getMessage();
     }
 

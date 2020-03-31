@@ -6,13 +6,13 @@ import java.io.InputStreamReader;
 
 public class UncryptedMessage {
     private String message;
-    private int shift;
+    private String shift;
 
     /**
      * Constructeur permettant de créer un message non crypté
      */
     public UncryptedMessage() {
-        this("", 0);
+        this("", "0");
     }
 
     /**
@@ -21,7 +21,7 @@ public class UncryptedMessage {
      * @param message nouveau message
      * @param shift   pas à appliquer
      */
-    public UncryptedMessage(String message, int shift) {
+    public UncryptedMessage(String message, String shift) {
         this.message = message;
         this.shift = shift;
     }
@@ -40,24 +40,31 @@ public class UncryptedMessage {
      *
      * @param shift pas à appliquer
      */
-    public void setShift(int shift) {
+    public void setShift(String shift) {
         this.shift = shift;
     }
 
     /**
      * Méthode appliquant la saisie au client
      */
-    public void saisie() throws IOException {
+    public void saisie(int crypteur) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println(">> Quel est le message ?\n");
         String res = "";
         res = br.readLine();
         this.setMessage(res);
-        do {
-            System.out.print(">> Quel est le pas à appliquer (shift) ? ");
-            res = br.readLine();
-        } while (!this.isInteger(res));
-        this.setShift(Integer.parseInt(res));
+        if(crypteur == 0) {
+            do {
+                System.out.print("\n>> Quel est le pas à appliquer (shift) ? ");
+                res = br.readLine();
+            } while (!this.isInteger(res));
+        } else {
+            do {
+                System.out.print("\n>> Quelle est la clé à appliquer ");
+                res = br.readLine();
+            } while (res.contains(" ") || res.isEmpty());
+        }
+        this.setShift(res);
     }
 
     /**
@@ -87,9 +94,9 @@ public class UncryptedMessage {
     /**
      * Méthode permettant de récupérer le pas à appliquer.
      *
-     * @return int le pas
+     * @return String le pas
      */
-    public int getShift() {
+    public String getShift() {
         return this.shift;
     }
 }
