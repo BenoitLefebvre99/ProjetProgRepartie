@@ -117,9 +117,4 @@ public class Vigenere implements ICryptage {
         }
         return tab;
     }
-
-    public static void main(String[] args) {
-        Vigenere v = new Vigenere("The quick brown fox jumps over 13 lazy dogs.", "cryptii");
-        System.out.println(v.getCodedMessage());
-    }
 }
