@@ -40,3 +40,31 @@ Pour démarrer le client, il suffit d'éxécuter la méthode *main* de `/MainCli
 12. Le client affiche le retour et le stocke dans le fichier `/sessions/session_DATE.txt`.
 13. Le client envoie un message vide pour se déconnecter.
 14. Le serveur supprime l'IDC du client et déconnecte le client.
+
+### Explication UML Client
+
+Toute la partie client se trouve dans le package `client`.
+*  `client.MainClient` : c'est la classe qui lance et traite correctement les demandes du serveur et de l'utilisateur en déléguant certaines tâches.
+*  `client.util.UncryptedMessage` : classe qui demande au client le pas ou la clé, ainsi que le message non codé à l'utilisateur.
+*  `client.util.ServerInit` : classe dont le constructeur reçoit le message brut initial du serveur et en découpe les différentes parties pour les mettre à disposition de MainClient.
+*  `client.util.CrypteursAvailable` : classe dont le constructeur reçoit le message contenant les crypteurs de la part du serveur. Elle découpe se tableau et mets à disposition la liste des cryptages disponibles.
+*  `client.sessions` : package recevant les résultats des sessions Questions/Réponses.
+*  `client.config` : package contenant les fichiers à traiter et leur résultat après traitement.
+
+### Explication UML Server
+
+Toute la partie serveur se trouve dans le package `server`.
+*  `server.MainServer` : c'est la classe qui lance les trois serveurs (Accueil, UDP, TCP) et gère le multithread grâce la java.nio.
+*  `server.tcp.ServerTcp` : classe qui gère le serveur de cryptage par le serveur de protocole TCP (port par défaut : 12346).
+*  `server.udp.ServerUdp` : classe qui gère le serveur de cryptage par le serveur de protocole UDP (port par défaut : 12347).
+*  `server.crypter.ICrypter` : interface définissant un crypteur.
+*  `server.crypter.Cesar` : classe permettant de définir un crypteur spéficique basé sur le cryptage de César.
+*  `server.crypter.Vigenere` : classe permettant de définir un crypteur spéficique basé sur le cryptage de Vigénère.
+*  `server.crypter.Crypteurs` : énumération des différents Crypteurs disponibles.
+*  `server.util.AllowList` : classe une liste d'autorisation d'IDC. Utilisée 2fois (ServerTcp et ServerUdp).
+*  `server.util.ClientReponse` : classe qui reçoit une demande brute de la part du client et la découpe pour utilisation. C'est cette classe qui crypte le message et mets à disposition la réponse au client.
+*  `server.util.Idc` : classe qui crée un IDC et génère la toute première réponse à envoyer au client pour établir la redirection.
+
+### Explication test
+
+Différents tests sont disponibles dans le package `test`. Ceux-ci fonctionnent avec Junit4.13 dont le jar est fourni dans /lib.
