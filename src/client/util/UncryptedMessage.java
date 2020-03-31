@@ -60,7 +60,7 @@ public class UncryptedMessage {
             } while (!this.isInteger(res));
         } else {
             do {
-                System.out.print("\n>> Quelle est la clé à appliquer ");
+                System.out.print("\n>> Quelle est la clé à appliquer ? ");
                 res = br.readLine();
             } while (res.contains(" ") || res.isEmpty());
         }

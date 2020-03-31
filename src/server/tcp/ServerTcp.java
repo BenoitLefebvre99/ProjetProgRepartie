@@ -48,13 +48,6 @@ public class ServerTcp {
         socket_server.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("> Serveur de cryptage TCP ouvert sur le port : '" + this.port + "'.");
     }
-    /*public void launch(Selector selector, ServerSocketChannel socket_server) throws IOException {
-        socket_server = ServerSocketChannel.open();
-        socket_server.configureBlocking(false);
-        socket_server.socket().bind(new InetSocketAddress(this.port));
-        socket_server.register(selector, SelectionKey.OP_ACCEPT);
-        System.out.println("> Serveur de cryptage TCP ouvert sur le port : '" + this.port + "'.");
-    }*/
 
     /**
      * Méthode permettant de traiter la demande du client

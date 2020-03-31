@@ -183,8 +183,7 @@ public class MainClient {
      */
     private String getMessage(int crypteur) throws IOException {
         this.noncrypte.saisie(crypteur);
-        //return this.server.getIdc() + ":" + crypteur + ":" + this.noncrypte.getShift() + ":" + this.noncrypte.getMessage();
-        return this.server.getIdc() + ":" + this.noncrypte.getShift() + ":" + this.noncrypte.getMessage();
+        return this.server.getIdc() + ":" + crypteur + ":" + this.noncrypte.getShift() + ":" + this.noncrypte.getMessage();
     }
 
     /**

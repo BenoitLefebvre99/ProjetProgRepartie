@@ -1,12 +1,15 @@
 package server.util;
 
 import server.crypter.Cesar;
+import server.crypter.Vigenere;
 
 public class ClientResponse {
     private long idc;
-    private int shift;
+    private String shift;
     private String before;
-    private Cesar crypteur;
+    private int crypteur;
+    private Cesar cesar;
+    private Vigenere vigenere;
     private boolean keepAlive;
 
     /**
@@ -17,9 +20,19 @@ public class ClientResponse {
     public ClientResponse(String reponseBrut) {
         this.keepAlive = true;
         this.cut(reponseBrut);
-        this.crypteur = new Cesar(this.before, this.shift);
+        this.initSelectedCrypt();
     }
 
+    /**
+     * Méthode initialisant le crypteur choisi.
+     */
+    private void initSelectedCrypt() {
+        if(this.crypteur == 0) {
+            this.cesar = new Cesar(this.before, Integer.parseInt(this.shift));
+        } else {
+            this.vigenere = new Vigenere(this.before, this.shift);
+        }
+    }
     /**
      * Méthode permettant de découper la réponse brute.
      *
@@ -30,12 +43,17 @@ public class ClientResponse {
             String tmp;
             tmp = brut.substring(0, brut.indexOf(':'));
             this.idc = Long.parseLong(tmp);
-            tmp = brut.substring(brut.indexOf(':') + 1, brut.lastIndexOf(':'));
-            this.shift = Integer.parseInt(tmp);
+            tmp = brut.substring(brut.indexOf(':') + 1);
+            tmp = tmp.substring(0 , tmp.indexOf(':'));
+            this.crypteur = Integer.parseInt(tmp);
+            tmp = brut.substring(brut.indexOf(':') + 1);
+            tmp = tmp.substring(tmp.indexOf(':') + 1, tmp.lastIndexOf(":"));
+            this.shift = tmp;
             tmp = brut.substring(brut.lastIndexOf(':') + 1);
             this.before = tmp;
             if(this.before.equals("")) this.keepAlive = false;
         } catch (Exception e) {
+            System.out.println(">>> Erreur lors de la découpe du message du client /!\\ .");
             this.keepAlive = false;
         }
     }
@@ -46,7 +64,11 @@ public class ClientResponse {
      * @return String message crypté
      */
     public String getCryptedMessage() {
-        return this.crypteur.getCodedMessage();
+        if(this.crypteur == 0) {
+            return this.cesar.getCodedMessage();
+        } else {
+            return this.vigenere.getCodedMessage();
+        }
     }
 
     /**
