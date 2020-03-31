@@ -9,6 +9,7 @@ La partie client permet de crypter de deux manières différentes :
     2. Fichiers `/config/non_traite_X.txt` préparés et traités au lancement du client.
         
 Schéma du fichier `/config/non_traite_X.txt` :
+
 | ligne  | valeur                              |
 | ------ | ----------------------------------- |
 | 1      | protocole (TCP ou UDP)              |
