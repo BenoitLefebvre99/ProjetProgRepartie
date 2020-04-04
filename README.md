@@ -49,7 +49,7 @@ Toute la partie client se trouve dans le package `client`.
 *  `client.util.ServerInit` : classe dont le constructeur reçoit le message brut initial du serveur et en découpe les différentes parties pour les mettre à disposition de MainClient.
 *  `client.util.CrypteursAvailable` : classe dont le constructeur reçoit le message contenant les crypteurs de la part du serveur. Elle découpe se tableau et mets à disposition la liste des cryptages disponibles.
 *  `client.sessions` : package recevant les résultats des sessions Questions/Réponses.
-*  `client.config` : package contenant les fichiers à traiter et leur résultat après traitement.
+*  `client.file.config` : package contenant les fichiers à traiter et leur résultat après traitement.
 
 ### Explication UML Server
 

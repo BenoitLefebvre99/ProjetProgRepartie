@@ -42,15 +42,15 @@ public class ClientResponse {
         try {
             String tmp;
             tmp = brut.substring(0, brut.indexOf(':'));
+            brut = brut.substring(brut.indexOf(":") + 1);
             this.idc = Long.parseLong(tmp);
-            tmp = brut.substring(brut.indexOf(':') + 1);
-            tmp = tmp.substring(0 , tmp.indexOf(':'));
+            tmp = brut.substring(0, brut.indexOf(':'));
+            brut = brut.substring(brut.indexOf(":") + 1);
             this.crypteur = Integer.parseInt(tmp);
-            tmp = brut.substring(brut.indexOf(':') + 1);
-            tmp = tmp.substring(tmp.indexOf(':') + 1, tmp.lastIndexOf(":"));
+            tmp = brut.substring(0, brut.indexOf(':'));
+            brut = brut.substring(brut.indexOf(":") + 1);
             this.shift = tmp;
-            tmp = brut.substring(brut.lastIndexOf(':') + 1);
-            this.before = tmp;
+            this.before = brut;
             if(this.before.equals("")) this.keepAlive = false;
         } catch (Exception e) {
             System.out.println(">>> Erreur lors de la découpe du message du client /!\\ .");
