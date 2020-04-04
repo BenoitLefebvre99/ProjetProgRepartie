@@ -49,16 +49,7 @@ public class MainClient {
      */
     public void launch() {
         try {
-            System.out.println(">> Connexion au serveur principal : '" + this.address + ":" + this.port + "'.");
-            String prot = this.chooseProtocole();
-            this.connexionServer();
-            this.protocol = prot;
-            this.send(this.protocol, "tcp");
-            this.server = new ServerInit(this.receive("tcp"));
-            this.crypteurs = new CrypteursAvailable(this.receive("tcp"));
-            this.disconnect();
-            this.port = this.server.getPort();
-            this.connexionServer();
+            this.initialisation();
             while (this.server.getKeepAlive()) {
                 this.barpresentation();
                 int tmp = this.chooseCrypteur();
@@ -72,10 +63,28 @@ public class MainClient {
     }
 
     /**
+     * Méthode privée initialisant la connexion du client au serveur.
+     *
+     * @throws IOException erreur lors de l'initialisation.
+     */
+    private void initialisation() throws IOException {
+        System.out.println(">> Connexion au serveur principal : '" + this.address + ":" + this.port + "'.");
+        String prot = this.chooseProtocole();
+        this.connexionServer();
+        this.protocol = prot;
+        this.send(this.protocol, "tcp");
+        this.server = new ServerInit(this.receive("tcp"));
+        this.crypteurs = new CrypteursAvailable(this.receive("tcp"));
+        this.disconnect();
+        this.port = this.server.getPort();
+        this.connexionServer();
+    }
+
+    /**
      * Méthode permettant de faire choisir un crypteur au client.
      *
      * @return int du crypteur
-     * @throws IOException
+     * @throws IOException erreur lors de la sélection du crypteur.
      */
     private int chooseCrypteur() throws IOException {
         System.out.println(this.crypteurs.toString());
@@ -92,7 +101,7 @@ public class MainClient {
     /**
      * Méthode permettant la connexion au serveur désiré.
      *
-     * @throws IOException
+     * @throws IOException erreur lors de la connexion.
      */
     private void connexionServer() throws IOException {
         if (this.protocol.toLowerCase().equals("tcp")) {
@@ -111,7 +120,7 @@ public class MainClient {
      * Méthode permettant de récupérer la réponse du client sous forme de String.
      *
      * @return String réponse du Serveur
-     * @throws IOException
+     * @throws IOException erreur lors de la réception
      */
     private String receive(String protocol) throws IOException {
         this.resetBuffer();
@@ -140,7 +149,7 @@ public class MainClient {
     /**
      * Méthode permettant d'obtenir l'accès au serveur de cryptage en demandant au serveur d'accueil.
      *
-     * @throws IOException
+     * @throws IOException erreur lors de l'envoi
      */
     private void send(String str, String protocol) throws IOException {
         this.buf = ByteBuffer.allocate(str.length() * 8);
@@ -160,7 +169,7 @@ public class MainClient {
     /**
      * Méthode demandant au client le protocol à utiliser.
      *
-     * @throws IOException
+     * @throws IOException erreur lors de la sélection du protocole
      */
     private String chooseProtocole() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -179,7 +188,7 @@ public class MainClient {
      * Méthode lisant le message à envoyer au client.
      *
      * @return String message à envoyer
-     * @throws IOException
+     * @throws IOException erreur lors de la génération du message crypté.
      */
     private String getMessage(int crypteur) throws IOException {
         this.noncrypte.saisie(crypteur);

@@ -12,6 +12,9 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
+/**
+ * Classe représentant un serveur TCP.
+ */
 public class ServerTcp {
     private int port;
     private AllowList allowList;

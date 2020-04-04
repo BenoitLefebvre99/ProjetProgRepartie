@@ -1,5 +1,8 @@
 package server.crypter;
 
+/**
+ * Classe représentant le crypteur selon Vigénère.
+ */
 public class Vigenere implements ICryptage {
     private String before;
     private String after;

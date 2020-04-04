@@ -2,6 +2,9 @@ package server.util;
 
 import java.util.Random;
 
+/**
+ * Classe représentant un IDC.
+ */
 public class Idc {
     private long idc;
     private String protocol;
@@ -10,8 +13,9 @@ public class Idc {
 
     /**
      * Contructeur Idc() permettant de créer un nouvel idc et d'obtenir le message à envoyer au client.
+     *
      * @param protocol "tcp" ou "udp"
-     * @param port int port du serveur
+     * @param port     int port du serveur
      */
     public Idc(String protocol, int port) {
         this.protocol = protocol.toUpperCase();
@@ -22,6 +26,7 @@ public class Idc {
 
     /**
      * Méthode permettant de récupérer la réponse complète du server.
+     *
      * @return IDC:PROTOCOL:PORT
      */
     public String getServerResponse() {
@@ -37,6 +42,7 @@ public class Idc {
 
     /**
      * Méthode renvoyant l'idc créé.
+     *
      * @return long idc
      */
     public long getIdc() {

@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * Classe représentant un message non crypté.
+ */
 public class UncryptedMessage {
     private String message;
     private String shift;
@@ -50,10 +53,22 @@ public class UncryptedMessage {
     public void saisie(int crypteur) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.println(">> Quel est le message ?\n");
-        String res = "";
+        String res;
         res = br.readLine();
         this.setMessage(res);
-        if(crypteur == 0) {
+        this.choixKey(crypteur, br);
+    }
+
+    /**
+     * Méthode privée appliquant la clé par rapport au crypteur choisi.
+     *
+     * @param crypteur id du crypteur
+     * @param br       BufferedReader
+     * @throws IOException erreur lors de la saisie de la clé.
+     */
+    private void choixKey(int crypteur, BufferedReader br) throws IOException {
+        String res;
+        if (crypteur == 0) {
             do {
                 System.out.print("\n>> Quel est le pas à appliquer (shift) ? ");
                 res = br.readLine();

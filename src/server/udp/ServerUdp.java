@@ -9,8 +9,10 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
+/**
+ * Classe représentant un serveur UDP.
+ */
 public class ServerUdp {
-    public final static int MAX = 100;
 
     private int port;
     private AllowList allowList;
@@ -19,23 +21,24 @@ public class ServerUdp {
 
     /**
      * Constructeur créant un serveur UDP au port souhaité.
+     *
      * @param port int port souhaité
      */
-    public ServerUdp(int port) throws SocketException {
+    public ServerUdp(int port) {
         this.port = port;
         this.allowList = new AllowList();
     }
 
     /**
-     * Méthode permettant de créer un serveur UDP au port par défaut 7777
-     * @throws SocketException
+     * Méthode permettant de créer un serveur UDP au port par défaut 12347
      */
-    public ServerUdp() throws SocketException {
+    public ServerUdp() {
         this(12347);
     }
 
     /**
      * Méthode permettant de créer, autoriser et récupérer l'idc d'un nouveau client.
+     *
      * @return String "IDC:PROTOCOL:PORT"
      */
     public String newIdc() {
@@ -46,6 +49,7 @@ public class ServerUdp {
 
     /**
      * Méthode renvoyant le port du serveur de cryptage UDP.
+     *
      * @return int port
      */
     public int getPort() {
@@ -66,7 +70,7 @@ public class ServerUdp {
     /**
      * Méthode permettant de traiter la demande du client
      *
-     * @throws IOException
+     * @throws IOException erreur lors du traitement de la réponse au client.
      */
     public void answer(SelectionKey key) throws IOException {
         this.datagram_server = (DatagramChannel) key.channel();
@@ -86,6 +90,12 @@ public class ServerUdp {
         }
     }
 
+    /**
+     * Méthode permettant une clé UDP.
+     *
+     * @param selector Selector
+     * @throws ClosedChannelException erreur lors de l'enregistrement
+     */
     public void register_udp(Selector selector) throws ClosedChannelException {
         this.datagram_server.register(selector, SelectionKey.OP_READ);
     }

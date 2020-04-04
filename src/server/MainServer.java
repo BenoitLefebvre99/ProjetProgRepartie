@@ -12,6 +12,9 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * Classe principale du serveur.
+ */
 public class MainServer {
     private Selector selector;
     private ServerSocketChannel socket_server;
@@ -113,9 +116,10 @@ public class MainServer {
     /**
      * Méthode permettant de remettre à zéro le buffer.
      */
-    private void resetBuffer(){
+    private void resetBuffer() {
         this.buf = ByteBuffer.allocate(2048);
     }
+
     /**
      * Méthode permettant de rediriger le client vers un serveur de cryptage.
      *

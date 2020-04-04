@@ -3,6 +3,9 @@ package server.util;
 import server.crypter.Cesar;
 import server.crypter.Vigenere;
 
+/**
+ * Classe découpant et représentant le message du client.
+ */
 public class ClientResponse {
     private long idc;
     private String shift;
@@ -33,6 +36,7 @@ public class ClientResponse {
             this.vigenere = new Vigenere(this.before, this.shift);
         }
     }
+
     /**
      * Méthode permettant de découper la réponse brute.
      *

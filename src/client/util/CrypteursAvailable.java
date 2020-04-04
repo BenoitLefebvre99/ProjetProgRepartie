@@ -1,14 +1,20 @@
 package client.util;
 
-
-import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Classe représentant la liste de crypteurs disponibles sur le serveur.
+ */
 public class CrypteursAvailable {
     private ArrayList<String> listCrypteurs;
     private boolean bug;
     private String message;
 
+    /**
+     * Constructeur permettant de créer la liste de crypteurs.
+     *
+     * @param tableauServeur liste reçue du serveur.
+     */
     public CrypteursAvailable(String tableauServeur) {
         this.listCrypteurs = new ArrayList<>();
         this.message = tableauServeur;
@@ -41,19 +47,29 @@ public class CrypteursAvailable {
         String toAdd;
         if (this.message.contains(",")) {
             toAdd = this.message.substring(0, this.message.indexOf(','));
-            if (toAdd.charAt(0) == ' ') {
-                toAdd = toAdd.substring(1);
-            }
+            toAdd = this.noBlanc(toAdd);
             this.listCrypteurs.add(toAdd);
             this.message = this.message.substring(this.message.indexOf(',') + 1);
             return true;
         } else if (this.message.length() > 0) {
-            if (this.listCrypteurs.isEmpty()) toAdd = this.message.substring(0);
+            if (this.listCrypteurs.isEmpty()) toAdd = this.message;
             else toAdd = this.message.substring(1);
             this.listCrypteurs.add(toAdd);
-            return false;
         }
         return false;
+    }
+
+    /**
+     * Méthode privée passant un espace s'il y en a un.
+     *
+     * @param toAdd le message à traiter
+     * @return message traîté
+     */
+    private String noBlanc(String toAdd) {
+        if (toAdd.charAt(0) == ' ') {
+            toAdd = toAdd.substring(1);
+        }
+        return toAdd;
     }
 
     /**

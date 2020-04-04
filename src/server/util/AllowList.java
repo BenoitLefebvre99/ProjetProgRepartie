@@ -2,6 +2,9 @@ package server.util;
 
 import java.util.ArrayList;
 
+/**
+ * Classe représentant une liste d'autorisation de connexion.
+ */
 public class AllowList {
     private ArrayList<Long> allowList;
 
@@ -14,6 +17,7 @@ public class AllowList {
 
     /**
      * Méthode permettant d'ajouter un nouvel idc à la liste autorisée.
+     *
      * @param idc identifiant à ajouter.
      */
     public void add(long idc) {
@@ -22,6 +26,7 @@ public class AllowList {
 
     /**
      * Méhode permettant de savoir si la liste contient un idc.
+     *
      * @param idc identifiant à tester.
      * @return true si la liste contient l'idc
      */
@@ -31,6 +36,7 @@ public class AllowList {
 
     /**
      * Methode qui retire un idc de la liste.
+     *
      * @param idc identifiant à supprimer
      * @return true si l'idc a été supprimé.
      */

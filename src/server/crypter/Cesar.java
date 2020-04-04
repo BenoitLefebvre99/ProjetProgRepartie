@@ -1,5 +1,8 @@
 package server.crypter;
 
+/**
+ * Classe représentant le cryptage selon César.
+ */
 public class Cesar implements ICryptage {
     private String before;
     private String after;

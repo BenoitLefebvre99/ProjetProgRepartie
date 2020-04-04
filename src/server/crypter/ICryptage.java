@@ -1,5 +1,8 @@
 package server.crypter;
 
+/**
+ * Interface définissant un crypteur.
+ */
 interface ICryptage {
     int MAX_MSG_LENGTH = 100;
 

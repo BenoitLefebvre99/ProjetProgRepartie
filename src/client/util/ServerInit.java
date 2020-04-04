@@ -1,5 +1,8 @@
 package client.util;
 
+/**
+ * Classe traîtant le message contenant les informations de connexion de la part du serveur.
+ */
 public class ServerInit {
     private long idc;
     private String protocole;
@@ -51,15 +54,6 @@ public class ServerInit {
      */
     public long getIdc() {
         return this.idc;
-    }
-
-    /**
-     * Méthode permettant de récupérer le protocole.
-     *
-     * @return protocole
-     */
-    public String getProtocole() {
-        return this.protocole;
     }
 
     /**
