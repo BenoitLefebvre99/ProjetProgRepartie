@@ -1,0 +1,10 @@
+TCP
+0
+-3
+Bonjour le monde !
+1
+lacle
+Cette phrase contient des signes :# à ne pas chiffrer
+0
+0
+CeTtE PhRaSe EsT DuRe À lIrE :)
