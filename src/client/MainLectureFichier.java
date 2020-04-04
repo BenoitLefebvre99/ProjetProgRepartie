@@ -27,11 +27,12 @@ public class MainLectureFichier {
 
     private void crypter() {
         Communication c = new Communication(this.lecture.getProtocol(), this.toCrypt);
+        this.toWriteInFile = c.getResult();
     }
 
     private String newName() {
         Date date = new Date();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat df = new SimpleDateFormat("yyyyMMdd-HHMMSS");
         return "traite_" + df.format(date) + ".txt";
     }
 

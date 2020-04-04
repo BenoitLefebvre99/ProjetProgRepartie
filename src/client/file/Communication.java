@@ -102,4 +102,8 @@ public class Communication {
     public void disconnect() throws IOException {
         this.socket_client.close();
     }
+
+    public ArrayList<String> getResult() {
+        return this.result;
+    }
 }
