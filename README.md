@@ -1,14 +1,14 @@
 # Projet Prog-Répartie Lefebvre Benoit
 
-## Présentation fonctionnement (Projet Non Terminé)
+## Présentation fonctionnement
 
 ### Préparatifs
 
 La partie client permet de crypter de deux manières différentes :
 1. Questions/Réponses : le client pose les questions à l'utilisateur et stocke les messages cryptés au fur et à mesure.
-2. Fichiers `/config/non_traite_X.txt` préparés et traités au lancement du client.
+2. Fichiers `config.txt` préparés et traités au lancement du client.
         
-Schéma du fichier `/config/non_traite_X.txt` :
+Schéma du fichier `config.txt` :
 
 | ligne  | valeur                              |
 | ------ | ----------------------------------- |
@@ -16,17 +16,21 @@ Schéma du fichier `/config/non_traite_X.txt` :
 | 2      | crypteur (0 César, 1 Vigénère, ...) | 
 | 3      | clé ou pas de cryptage              |
 | 4      | phrase à crypter (max 100c.)        |
+| 5      | crypteur (0 César, 1 Vigénère, ...) | 
+| 6      | clé ou pas de cryptage              |
+| 7      | phrase à crypter (max 100c.)        |
 
-Dans le cas de l'utilisation de fichiers, les résultats sont stockés dans le fichier `/config/traite_datetime.txt`.
+Dans le cas de l'utilisation de fichiers, les résultats sont stockés dans le fichier `traite_yyyyMMDD-HHMMSS.txt`.
 
 ### Démarrage
 
 Pour démarrer les serveurs, il faut éxécuter la méthode *main* de `/MainServer.java`.
 Pour démarrer le client, il suffit d'éxécuter la méthode *main* de `/MainClient.java`.
+Pour démarrer le client traîtant le fichier `config.txt`, il suffit d'éxécuter la méthode *main* de `/MainLectureFichier.java`.
 
 ### Déroulement Utilisateur
 
-1. Le client commence par la gestion des fichiers (voir plus bas).
+1. Cette partie ne concerne pas la gestion des fichiers (voir plus bas).
 2. Ensuite vient le Questions / Réponses.
 3. Le client demande à l'utilisateur quel protocole utiliser ? (UDP/TCP)
 4. Le client envoie alors la réponse au serveur d'accueil 'localhost:12345'.
@@ -37,9 +41,18 @@ Pour démarrer le client, il suffit d'éxécuter la méthode *main* de `/MainCli
 9. Le client se déconnecte alors du serveur d'accueil pour se connecter à l'adresse reçue.
 10. Le client questionne à nouveau l'utilisateur et envoie au serveur de cryptage un message de la forme `IDC:IDCRYPTEUR:SHIFT:MESSAGE`.
 11. Le serveur traite la demande du client après avoir vérifié que ce dernier présente un IDC valable.
-12. Le client affiche le retour et le stocke dans le fichier `/sessions/session_DATE.txt`.
-13. Le client envoie un message vide pour se déconnecter.
-14. Le serveur supprime l'IDC du client et déconnecte le client.
+12. Le client envoie un message vide pour se déconnecter.
+13. Le serveur supprime l'IDC du client et déconnecte le client.
+
+### Gestion par fichier
+
+1. Le client ouvre le fichier `config.txt` bien préparé (fichier exemple fourni).
+2. Le client traîte l'ouverture du fichier, ainsi que l'extraction du protocole.
+3. Le client crée une liste de tous les messages à traîter.
+4. Le client se connecte au serveur et reçoit l'adresse et l'IDC pour se connecter à un serveur de cryptage adapté au protocole demandé.
+5. Le client envoie les messages à crypter au serveur, qui va les crypter et les envoyer.
+6. Le client complète à alors une liste de messages cryptés.
+7. Pour finir, le client intègre le contenu de la liste au fichier `traite_yyyyMMDD-HHMMSS.txt`.
 
 ### Explication UML Client
 
