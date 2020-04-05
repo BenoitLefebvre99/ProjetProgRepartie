@@ -64,6 +64,12 @@ Toute la partie client se trouve dans le package `client`.
 *  `client.sessions` : package recevant les résultats des sessions Questions/Réponses.
 *  `client.file.config` : package contenant les fichiers à traiter et leur résultat après traitement.
 
+Pour la partie traitement par fichier :
+*  `client.MainLectureFichier` : c'est la classe principale, à éxécuter, et qui va orchestrer le cryptage des différents messages contenus dans `config.txt`.
+*  `client.file.Communication` : c'est la classe qui va communiquer avec le serveur principale, puis le serveur de cryptage pour finalement transmettre une liste de messages cryptés.
+*  `client.file.LectureFichier` : c'est la classe qui ouvre et découpe le fichier `config.txt`. Elle fabrique et transmet les messages à crypter.
+*  `client.file.MesasgeFile` :  c'est la classe qui représente un message non crypté (ID crypteur, CLE ou SHIFT, MESSAGE NON CODE).
+
 ### Explication UML Server
 
 Toute la partie serveur se trouve dans le package `server`.
