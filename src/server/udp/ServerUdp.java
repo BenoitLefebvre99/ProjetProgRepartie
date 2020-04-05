@@ -58,6 +58,9 @@ public class ServerUdp {
 
     /**
      * Méthode permettant de lancer le serveur UDP.
+     *
+     * @param selector Selecteur à utiliser
+     * @throws IOException erreur lors du lancement du serveur UDP
      */
     public void launch(Selector selector) throws IOException {
         this.datagram_server = DatagramChannel.open();
@@ -70,6 +73,7 @@ public class ServerUdp {
     /**
      * Méthode permettant de traiter la demande du client
      *
+     * @param key SelectionKey
      * @throws IOException erreur lors du traitement de la réponse au client.
      */
     public void answer(SelectionKey key) throws IOException {

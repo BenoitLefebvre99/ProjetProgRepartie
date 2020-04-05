@@ -23,7 +23,7 @@ public class ServerTcp {
      * Méthode permettant de créer un serveur TCP au port indiqué.
      *
      * @param port port souhaité.
-     * @throws IOException
+     * @throws IOException erreur lors de l'initialisation du serveur.
      */
     public ServerTcp(int port) throws IOException {
         this.port = port;
@@ -31,9 +31,9 @@ public class ServerTcp {
     }
 
     /**
-     * Méthode permettant de créer un serveur TCP au port par défaut (12345).
+     * Méthode permettant de créer un serveur TCP au port par défaut (12346).
      *
-     * @throws IOException
+     * @throws IOException erreur lors de l'initialisation du serveur.
      */
     public ServerTcp() throws IOException {
         this(12346);
@@ -42,7 +42,8 @@ public class ServerTcp {
     /**
      * Méthode permettant de lancer le serveur TCP.
      *
-     * @throws IOException
+     * @param selector selecteur de channel
+     * @throws IOException erreur lors du lancement du serveur TCP
      */
     public void launch(Selector selector) throws IOException {
         ServerSocketChannel socket_server = ServerSocketChannel.open();
@@ -57,7 +58,7 @@ public class ServerTcp {
      *
      * @param client_message message brut du client
      * @param client         socket du client
-     * @throws IOException
+     * @throws IOException erreur lors du traitement de la réception ou de l'envoi.
      */
     public void answer(String client_message, SocketChannel client) throws IOException {
         ClientResponse work = new ClientResponse(client_message);

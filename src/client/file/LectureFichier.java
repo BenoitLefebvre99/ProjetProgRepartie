@@ -69,7 +69,7 @@ public class LectureFichier {
     /**
      * Méthode permettant de confirmer que tout s'est bien déroulé.
      *
-     * @return
+     * @return true si tout est ok
      */
     public boolean isGood() {
         return this.good;

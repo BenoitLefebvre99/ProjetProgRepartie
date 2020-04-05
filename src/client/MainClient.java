@@ -119,6 +119,7 @@ public class MainClient {
     /**
      * Méthode permettant de récupérer la réponse du client sous forme de String.
      *
+     * @param protocol protocol à utiliser
      * @return String réponse du Serveur
      * @throws IOException erreur lors de la réception
      */
@@ -149,6 +150,8 @@ public class MainClient {
     /**
      * Méthode permettant d'obtenir l'accès au serveur de cryptage en demandant au serveur d'accueil.
      *
+     * @param str      chaîne de caractères à envoyer.
+     * @param protocol protocole à utiliser pour l'envoi.
      * @throws IOException erreur lors de l'envoi
      */
     private void send(String str, String protocol) throws IOException {
@@ -169,6 +172,7 @@ public class MainClient {
     /**
      * Méthode demandant au client le protocol à utiliser.
      *
+     * @return protocole choisi par l'utilisateur.
      * @throws IOException erreur lors de la sélection du protocole
      */
     private String chooseProtocole() throws IOException {
@@ -187,6 +191,7 @@ public class MainClient {
     /**
      * Méthode lisant le message à envoyer au client.
      *
+     * @param crypteur id du crypteur
      * @return String message à envoyer
      * @throws IOException erreur lors de la génération du message crypté.
      */
@@ -197,6 +202,8 @@ public class MainClient {
 
     /**
      * Méthode déconnectant le client du serveur.
+     *
+     * @throws IOException erreur lors de la déconnexion.
      */
     public void disconnect() throws IOException {
         this.socket_client.close();

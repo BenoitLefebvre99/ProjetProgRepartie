@@ -28,7 +28,7 @@ public class MainServer {
      * Méthode permettant de créer le serveur TCP d'accueil au port indiqué.
      *
      * @param port port souhaité.
-     * @throws IOException
+     * @throws IOException erreur lors de l'initialisation du serveur.
      */
     public MainServer(int port) throws IOException {
         this.selector = Selector.open();
@@ -41,7 +41,7 @@ public class MainServer {
     /**
      * Méthode permettant de créer le serveur TCP d'accueil au port par défaut (12345).
      *
-     * @throws IOException
+     * @throws IOException erreur lors de l'initialisation du serveur.
      */
     public MainServer() throws IOException {
         this(12345);
@@ -50,7 +50,7 @@ public class MainServer {
     /**
      * Méthode privée configurant le serveur principal.
      *
-     * @throws IOException
+     * @throws IOException erreur lors de la configuration du serveur principal.
      */
     private void configureMainServer() throws IOException {
         this.socket_server = ServerSocketChannel.open();
@@ -62,8 +62,6 @@ public class MainServer {
 
     /**
      * Méthode permettant de lancer le serveur.
-     *
-     * @throws IOException
      */
     public void launch() {
         try {
@@ -78,9 +76,9 @@ public class MainServer {
     }
 
     /**
-     * Méthode gérant les connexions aux différentes 'channel'.
+     * Méthode privée gérant les connexions aux différentes 'channel'.
      *
-     * @throws IOException
+     * @throws IOException erreur lors de la gestion des connexions.
      */
     private void gestionConnexions() throws IOException {
         while (true) {
@@ -124,7 +122,7 @@ public class MainServer {
      * Méthode permettant de rediriger le client vers un serveur de cryptage.
      *
      * @param client client à rediriger
-     * @throws IOException
+     * @throws IOException erreur lors de la redirection du client.
      */
     private void redirection(SocketChannel client) throws IOException {
         this.resetBuffer();
@@ -143,7 +141,7 @@ public class MainServer {
      * Méhode permettant d'identifier et d'enregistrer une connexion.
      *
      * @param key connexion
-     * @throws IOException
+     * @throws IOException erreur lors de l'enregistrement de la clé.
      */
     private void registerKey(SelectionKey key) throws IOException {
         SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
@@ -182,6 +180,8 @@ public class MainServer {
 
     /**
      * Méthode permettant de lancer le serveur de communication TCP.
+     *
+     * @throws IOException erreur lors du lancement du serveur TCP
      */
     private void launchTCPServer() throws IOException {
         this.tcp_server.launch(this.selector);
@@ -189,6 +189,8 @@ public class MainServer {
 
     /**
      * Méthode permettant de lancer le serveur de communication UDP.
+     *
+     * @throws IOException erreur lors du lancement du serveur UDP
      */
     private void launchUDPServer() throws IOException {
         this.udp_server.launch(this.selector);
@@ -197,8 +199,8 @@ public class MainServer {
     /**
      * Méthode permettant d'enregistrer le client tcp.
      *
-     * @param socketChannel
-     * @throws IOException
+     * @param socketChannel socket à enregistrer en lecture
+     * @throws IOException erreur lors de l'enregistrement de la clé.
      */
     private void register(SocketChannel socketChannel) throws IOException {
         socketChannel.register(selector, SelectionKey.OP_READ);
@@ -207,7 +209,7 @@ public class MainServer {
     /**
      * Méthode permettant d'éteindre le serveur.
      *
-     * @throws IOException
+     * @throws IOException erreur lors de l'extinction du serveur
      */
     public void shutdown() throws IOException {
         this.socket_server.close();

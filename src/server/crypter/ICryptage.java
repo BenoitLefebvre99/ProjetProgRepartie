@@ -8,13 +8,13 @@ interface ICryptage {
 
     /**
      * Méthode renvoyant le message codé.
+     *
+     * @return message codé.
      */
     String getCodedMessage();
 
     /**
      * Méthode permettant de récupérer le message codé.
-     *
-     * @return String : msg codé
      */
     void crypt();
 }

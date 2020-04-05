@@ -49,6 +49,9 @@ public class UncryptedMessage {
 
     /**
      * Méthode appliquant la saisie au client
+     *
+     * @param crypteur id du crypteur
+     * @throws IOException erreur lors de la saisie du message.
      */
     public void saisie(int crypteur) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
