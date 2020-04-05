@@ -6,7 +6,7 @@
 
 La partie client permet de crypter de deux manières différentes :
 1. Questions/Réponses : le client pose les questions à l'utilisateur et stocke les messages cryptés au fur et à mesure.
-2. Fichiers `config.txt` préparés et traités au lancement du client.
+2. Fichier `config.txt` préparé et traité au lancement du client. Il doit être placé à la racine du projet.
         
 Schéma du fichier `config.txt` :
 
