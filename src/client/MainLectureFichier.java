@@ -58,7 +58,7 @@ public class MainLectureFichier {
             try {
                 FileWriter writer = new FileWriter(this.nomFichier);
                 for (String res : this.toWriteInFile) {
-                    writer.write(res);
+                    writer.write(res + "\n");
                 }
                 writer.close();
                 System.out.println(">> Tout a bien été traité !");
